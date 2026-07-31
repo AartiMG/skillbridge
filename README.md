@@ -198,7 +198,7 @@ python manage.py test
 ```
 
 ---
-## Live
+## Live Demo
 
 https://skillbridge-0my3.onrender.com/
 
