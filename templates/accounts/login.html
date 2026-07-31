@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign In - SkillBridge{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-6 col-lg-5">
+      <div class="custom-card p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="brand-icon bg-primary text-white mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.5rem;">
+            <i class="bi bi-box-arrow-in-right"></i>
+          </div>
+          <h2 class="fw-bold text-white mb-1">Welcome Back</h2>
+          <p class="text-muted small">Sign in to manage your exchanges and skills</p>
+        </div>
+
+        <form method="post" action="{% url 'login' %}{% if request.GET.next %}?next={{ request.GET.next }}{% endif %}">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold small text-white">Username or Email</label>
+            <input type="text" name="username" class="form-control" placeholder="Enter username or email" required autofocus>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold small text-white">Password</label>
+            <input type="password" name="password" class="form-control" placeholder="Enter password" required>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check">
+              <input type="checkbox" class="form-check-input" id="rememberMe">
+              <label class="form-check-label small text-muted" for="rememberMe">Remember me</label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary-custom w-100 py-3 shadow-sm mb-3">
+            <i class="bi bi-unlock-fill me-2"></i> Sign In
+          </button>
+        </form>
+
+        <div class="text-center border-top border-dark pt-3 mt-3">
+          <p class="small text-muted mb-0">
+            Don't have an account yet? <a href="{% url 'register' %}" class="fw-bold text-primary text-decoration-none">Join SkillBridge</a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

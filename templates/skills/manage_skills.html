@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Skills - SkillBridge{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row g-4">
+    <!-- Add Skill Form Card -->
+    <div class="col-lg-5">
+      <div class="custom-card p-4">
+        <h4 class="fw-bold text-white mb-1"><i class="bi bi-plus-circle text-primary me-2"></i> Add Skill to Profile</h4>
+        <p class="text-muted small mb-4">Select an existing skill or define a new skill to teach or learn.</p>
+
+        <form method="post" action="{% url 'manage_skills' %}">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold small text-white">Mode</label>
+            <div class="d-flex gap-3">
+              {% for radio in form.add_type %}
+                <div class="form-check">
+                  {{ radio.tag }}
+                  <label class="form-check-label small text-white" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- Existing Skill Section -->
+          <div id="existing-skill-section" class="mb-3">
+            <label class="form-label fw-semibold small text-white">Select Existing Skill</label>
+            {{ form.existing_skill }}
+            {% if form.existing_skill.errors %}
+              <div class="text-danger small mt-1">{{ form.existing_skill.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <!-- New Skill Section -->
+          <div id="new-skill-section" class="mb-3" style="display: none;">
+            <div class="mb-3">
+              <label class="form-label fw-semibold small text-white">Skill Name</label>
+              {{ form.new_skill_name }}
+              {% if form.new_skill_name.errors %}
+                <div class="text-danger small mt-1">{{ form.new_skill_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small text-white">Category</label>
+              {{ form.new_skill_category }}
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label fw-semibold small text-white">Description</label>
+              {{ form.new_skill_description }}
+            </div>
+          </div>
+
+          <div class="row g-3 mb-4">
+            <div class="col-6">
+              <label class="form-label fw-semibold small text-white">Skill Type</label>
+              {{ form.skill_type }}
+            </div>
+
+            <div class="col-6">
+              <label class="form-label fw-semibold small text-white">Proficiency</label>
+              {{ form.proficiency_level }}
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary-custom w-100 py-2 shadow-sm">
+            <i class="bi bi-check-circle me-1"></i> Add Skill
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Current User Skills List Card -->
+    <div class="col-lg-7">
+      <div class="custom-card p-4">
+        <h4 class="fw-bold text-white mb-4"><i class="bi bi-lightbulb text-warning me-2"></i> My Listed Skills</h4>
+
+        <!-- Skills I Can Teach -->
+        <div class="mb-4">
+          <h6 class="fw-bold text-white mb-3 d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-award-fill text-primary me-2"></i> Skills I Can Teach</span>
+            <span class="badge bg-primary rounded-pill">{{ teach_skills|length }}</span>
+          </h6>
+
+          {% if teach_skills %}
+            <div class="list-group">
+              {% for us in teach_skills %}
+                <div class="list-group-item d-flex justify-content-between align-items-center p-3 border border-dark rounded-3 mb-2 bg-light">
+                  <div>
+                    <strong class="d-block text-white">{{ us.skill.name }}</strong>
+                    <span class="badge-category me-2" style="font-size: 0.75rem;">{{ us.skill.category }}</span>
+                    <span class="badge-teach" style="font-size: 0.75rem;">{{ us.proficiency_level }}</span>
+                  </div>
+                  <a href="{% url 'remove_user_skill' us.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove {{ us.skill.name }} from your profile?');">
+                    <i class="bi bi-trash me-1"></i> Remove
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <!-- Modern Empty State -->
+            <div class="p-4 border border-dark rounded-3 bg-light text-center">
+              <div class="brand-icon bg-primary bg-opacity-20 text-primary mx-auto mb-2" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                <i class="bi bi-mortarboard"></i>
+              </div>
+              <p class="text-muted small mb-0">You haven't listed any skills you can teach yet. Use the form on the left to add your first skill!</p>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Skills I Want to Learn -->
+        <div>
+          <h6 class="fw-bold text-white mb-3 d-flex justify-content-between align-items-center">
+            <span><i class="bi bi-journal-code me-2" style="color: #2dd4bf;"></i> Skills I Want to Learn</span>
+            <span class="badge text-white rounded-pill" style="background-color: #0d9488;">{{ learn_skills|length }}</span>
+          </h6>
+
+          {% if learn_skills %}
+            <div class="list-group">
+              {% for us in learn_skills %}
+                <div class="list-group-item d-flex justify-content-between align-items-center p-3 border border-dark rounded-3 mb-2 bg-light">
+                  <div>
+                    <strong class="d-block text-white">{{ us.skill.name }}</strong>
+                    <span class="badge-category me-2" style="font-size: 0.75rem;">{{ us.skill.category }}</span>
+                    <span class="badge-learn" style="font-size: 0.75rem;">{{ us.proficiency_level }}</span>
+                  </div>
+                  <a href="{% url 'remove_user_skill' us.id %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Remove {{ us.skill.name }} from your profile?');">
+                    <i class="bi bi-trash me-1"></i> Remove
+                  </a>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <!-- Modern Empty State -->
+            <div class="p-4 border border-dark rounded-3 bg-light text-center">
+              <div class="brand-icon bg-success bg-opacity-20 text-success mx-auto mb-2" style="width: 44px; height: 44px; font-size: 1.2rem;">
+                <i class="bi bi-book"></i>
+              </div>
+              <p class="text-muted small mb-0">You haven't added any learning goals yet.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

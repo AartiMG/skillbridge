@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Submit Feedback - SkillBridge{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-6">
+      <div class="custom-card p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="brand-icon bg-warning text-white mx-auto mb-3" style="width: 48px; height: 48px; font-size: 1.5rem;">
+            <i class="bi bi-star-fill"></i>
+          </div>
+          <h2 class="fw-bold text-white mb-1">Leave Peer Review</h2>
+          <p class="text-muted small">Rate your experience learning with {{ partner.first_name|default:partner.username }} (@{{ partner.username }})</p>
+        </div>
+
+        <div class="p-3 bg-light rounded-3 mb-4 border border-dark">
+          <span class="small fw-bold text-white d-block mb-1">Exchange Details:</span>
+          <p class="small text-muted mb-0">
+            Skills Exchanged: <span class="badge-teach me-1">{{ exchange_req.skill_offered.name }}</span> and <span class="badge-learn">{{ exchange_req.skill_requested.name }}</span>
+          </p>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="mb-4">
+            <label class="form-label fw-bold text-white">Rating (1 to 5 Stars)</label>
+            {{ form.rating }}
+            {% if form.rating.errors %}
+              <div class="text-danger small mt-1">{{ form.rating.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label fw-bold text-white">Review Comments (Optional)</label>
+            {{ form.comment }}
+            {% if form.comment.errors %}
+              <div class="text-danger small mt-1">{{ form.comment.errors.0 }}</div>
+            {% endif %}
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 border-top border-dark pt-3">
+            <a href="{% url 'requests_list' %}" class="btn btn-outline-custom">Skip for Now</a>
+            <button type="submit" class="btn btn-primary-custom px-4 shadow-sm">
+              <i class="bi bi-check-circle-fill me-1"></i> Submit Feedback
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

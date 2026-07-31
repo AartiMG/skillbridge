@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+
+{% block title %}Skill Exchange Requests - SkillBridge{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+      <h1 class="fw-bold text-white mb-1">Skill Exchange Requests</h1>
+      <p class="text-muted small mb-0">Track pending, active, and completed peer exchange sessions.</p>
+    </div>
+    <a href="{% url 'explore' %}" class="btn btn-primary-custom shadow-sm">
+      <i class="bi bi-person-plus me-1"></i> Find More Peers
+    </a>
+  </div>
+
+  <!-- Filter Tabs -->
+  <ul class="nav nav-pills mb-4 gap-2 border-bottom border-dark pb-3">
+    <li class="nav-item">
+      <a class="nav-link rounded-pill fw-semibold {% if tab == 'received' %}active{% endif %}" href="{% url 'requests_list' %}?tab=received">
+        <i class="bi bi-inbox-fill me-1"></i> Received Pending
+        <span class="badge rounded-pill ms-1">{{ received_pending|length }}</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link rounded-pill fw-semibold {% if tab == 'sent' %}active{% endif %}" href="{% url 'requests_list' %}?tab=sent">
+        <i class="bi bi-send-fill me-1"></i> Sent Pending
+        <span class="badge rounded-pill ms-1">{{ sent_pending|length }}</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link rounded-pill fw-semibold {% if tab == 'active' %}active{% endif %}" href="{% url 'requests_list' %}?tab=active">
+        <i class="bi bi-play-circle-fill me-1"></i> Active Exchanges
+        <span class="badge rounded-pill ms-1">{{ active_exchanges|length }}</span>
+      </a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link rounded-pill fw-semibold {% if tab == 'completed' %}active{% endif %}" href="{% url 'requests_list' %}?tab=completed">
+        <i class="bi bi-archive-fill me-1"></i> Completed & History
+        <span class="badge rounded-pill ms-1">{{ completed_exchanges|length }}</span>
+      </a>
+    </li>
+  </ul>
+
+  <!-- Tab Contents -->
+  {% if tab == 'received' %}
+    <div class="custom-card p-4">
+      <h5 class="fw-bold text-white mb-3"><i class="bi bi-inbox text-primary me-2"></i> Incoming Exchange Requests</h5>
+      {% if received_pending %}
+        <div class="d-flex flex-column gap-3">
+          {% for req in received_pending %}
+            <div class="p-4 border rounded-3 bg-light shadow-xs">
+              <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                  <div class="avatar-circle avatar-placeholder fs-4">
+                    {{ req.sender.first_name|default:req.sender.username|slice:":1"|upper }}
+                  </div>
+                  <div>
+                    <h6 class="fw-bold text-white mb-1">{{ req.sender.first_name|default:req.sender.username }} (@{{ req.sender.username }})</h6>
+                    <p class="small text-muted mb-1">
+                      Wants to teach: <span class="badge-teach me-2">{{ req.skill_offered.name }}</span>
+                      Wants to learn: <span class="badge-learn">{{ req.skill_requested.name }}</span>
+                    </p>
+                    {% if req.message %}
+                      <p class="small text-secondary fst-italic mb-0 bg-dark p-2 rounded border border-dark">"{{ req.message }}"</p>
+                    {% endif %}
+                  </div>
+                </div>
+
+                <div class="d-flex gap-2">
+                  <a href="{% url 'respond_request' req.id 'reject' %}" class="btn btn-sm btn-outline-danger" onclick="return confirm('Reject this request?');">
+                    <i class="bi bi-x-lg me-1"></i> Reject
+                  </a>
+                  <a href="{% url 'respond_request' req.id 'accept' %}" class="btn btn-sm btn-success fw-semibold">
+                    <i class="bi bi-check-lg me-1"></i> Accept Exchange
+                  </a>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <!-- Empty State Card -->
+        <div class="text-center py-5">
+          <div class="brand-icon bg-primary bg-opacity-20 text-primary mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem;">
+            <i class="bi bi-inbox"></i>
+          </div>
+          <h6 class="fw-bold text-white mb-1">No Pending Received Requests</h6>
+          <p class="text-muted small mb-3">You don't have any incoming skill exchange requests right now.</p>
+          <a href="{% url 'explore' %}" class="btn btn-sm btn-primary-custom">Explore Learners</a>
+        </div>
+      {% endif %}
+    </div>
+
+  {% elif tab == 'sent' %}
+    <div class="custom-card p-4">
+      <h5 class="fw-bold text-white mb-3"><i class="bi bi-send text-primary me-2"></i> Sent Exchange Requests</h5>
+      {% if sent_pending %}
+        <div class="d-flex flex-column gap-3">
+          {% for req in sent_pending %}
+            <div class="p-4 border rounded-3 bg-light shadow-xs">
+              <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div>
+                  <h6 class="fw-bold text-white mb-1">Sent to {{ req.receiver.first_name|default:req.receiver.username }} (@{{ req.receiver.username }})</h6>
+                  <p class="small text-muted mb-1">
+                    Offered: <span class="badge-teach me-2">{{ req.skill_offered.name }}</span>
+                    Requested: <span class="badge-learn">{{ req.skill_requested.name }}</span>
+                  </p>
+                  <span class="status-badge status-{{ req.status }}">Pending Response</span>
+                </div>
+
+                <a href="{% url 'respond_request' req.id 'cancel' %}" class="btn btn-sm btn-outline-secondary" onclick="return confirm('Cancel this request?');">
+                  <i class="bi bi-trash me-1"></i> Cancel Request
+                </a>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <!-- Empty State Card -->
+        <div class="text-center py-5">
+          <div class="brand-icon bg-primary bg-opacity-20 text-primary mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem;">
+            <i class="bi bi-send"></i>
+          </div>
+          <h6 class="fw-bold text-white mb-1">No Pending Sent Requests</h6>
+          <p class="text-muted small mb-3">You haven't sent any skill exchange requests pending approval.</p>
+          <a href="{% url 'explore' %}" class="btn btn-sm btn-primary-custom">Find Peers to Connect</a>
+        </div>
+      {% endif %}
+    </div>
+
+  {% elif tab == 'active' %}
+    <div class="custom-card p-4">
+      <h5 class="fw-bold text-white mb-3"><i class="bi bi-play-circle text-success me-2"></i> Active Peer Exchanges</h5>
+      {% if active_exchanges %}
+        <div class="d-flex flex-column gap-3">
+          {% for req in active_exchanges %}
+            {% if req.sender == user %}
+              {% with partner=req.receiver %}
+                <div class="p-4 border rounded-3 bg-light shadow-xs">
+                  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div>
+                      <h6 class="fw-bold text-white mb-1">Partner: {{ partner.first_name|default:partner.username }} (@{{ partner.username }})</h6>
+                      <p class="small text-muted mb-1">
+                        Offered Skill: <span class="badge-teach me-2">{{ req.skill_offered.name }}</span>
+                        Requested Skill: <span class="badge-learn">{{ req.skill_requested.name }}</span>
+                      </p>
+                      <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 small">In Progress</span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                      <a href="{% url 'profile_detail' partner.username %}" class="btn btn-sm btn-outline-custom">
+                        <i class="bi bi-person me-1"></i> Partner Profile
+                      </a>
+                      <a href="{% url 'respond_request' req.id 'complete' %}" class="btn btn-sm btn-success fw-semibold">
+                        <i class="bi bi-check-circle me-1"></i> Mark as Completed
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endwith %}
+            {% else %}
+              {% with partner=req.sender %}
+                <div class="p-4 border rounded-3 bg-light shadow-xs">
+                  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                    <div>
+                      <h6 class="fw-bold text-white mb-1">Partner: {{ partner.first_name|default:partner.username }} (@{{ partner.username }})</h6>
+                      <p class="small text-muted mb-1">
+                        Offered Skill: <span class="badge-teach me-2">{{ req.skill_offered.name }}</span>
+                        Requested Skill: <span class="badge-learn">{{ req.skill_requested.name }}</span>
+                      </p>
+                      <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 small">In Progress</span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                      <a href="{% url 'profile_detail' partner.username %}" class="btn btn-sm btn-outline-custom">
+                        <i class="bi bi-person me-1"></i> Partner Profile
+                      </a>
+                      <a href="{% url 'respond_request' req.id 'complete' %}" class="btn btn-sm btn-success fw-semibold">
+                        <i class="bi bi-check-circle me-1"></i> Mark as Completed
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              {% endwith %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <!-- Empty State Card -->
+        <div class="text-center py-5">
+          <div class="brand-icon bg-success bg-opacity-20 text-success mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem;">
+            <i class="bi bi-arrow-left-right"></i>
+          </div>
+          <h6 class="fw-bold text-white mb-1">No Active Skill Exchanges</h6>
+          <p class="text-muted small mb-3">You don't have any skill exchanges currently in progress.</p>
+          <a href="{% url 'explore' %}" class="btn btn-sm btn-primary-custom">Find a Learning Partner</a>
+        </div>
+      {% endif %}
+    </div>
+
+  {% elif tab == 'completed' %}
+    <div class="custom-card p-4">
+      <h5 class="fw-bold text-white mb-3"><i class="bi bi-archive text-secondary me-2"></i> Past Exchange History</h5>
+      {% if completed_exchanges %}
+        <div class="d-flex flex-column gap-3">
+          {% for req in completed_exchanges %}
+            {% if req.sender == user %}
+              {% with partner=req.receiver %}
+                <div class="p-3 border rounded-3 bg-light">
+                  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div>
+                      <div class="d-flex align-items-center gap-2 mb-1">
+                        <strong class="text-white small">Partner: @{{ partner.username }}</strong>
+                        <span class="status-badge status-{{ req.status }}">{{ req.status }}</span>
+                      </div>
+                      <p class="small text-muted mb-0">
+                        {{ req.skill_offered.name }} <i class="bi bi-arrow-left-right mx-1"></i> {{ req.skill_requested.name }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              {% endwith %}
+            {% else %}
+              {% with partner=req.sender %}
+                <div class="p-3 border rounded-3 bg-light">
+                  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                    <div>
+                      <div class="d-flex align-items-center gap-2 mb-1">
+                        <strong class="text-white small">Partner: @{{ partner.username }}</strong>
+                        <span class="status-badge status-{{ req.status }}">{{ req.status }}</span>
+                      </div>
+                      <p class="small text-muted mb-0">
+                        {{ req.skill_offered.name }} <i class="bi bi-arrow-left-right mx-1"></i> {{ req.skill_requested.name }}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              {% endwith %}
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% else %}
+        <!-- Empty State Card -->
+        <div class="text-center py-5">
+          <div class="brand-icon bg-secondary bg-opacity-20 text-secondary mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem;">
+            <i class="bi bi-archive"></i>
+          </div>
+          <h6 class="fw-bold text-white mb-1">No Past Exchange History</h6>
+          <p class="text-muted small mb-0">Completed or archived exchanges will appear here.</p>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

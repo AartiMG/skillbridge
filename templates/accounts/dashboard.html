@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - SkillBridge{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <!-- Header Welcome Banner -->
+  <div class="custom-card p-4 p-md-5 mb-4">
+    <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-4">
+      <div class="d-flex align-items-center gap-3">
+        {% if profile.profile_image %}
+          <img src="{{ profile.profile_image.url }}" alt="{{ user.username }}" class="avatar-large">
+        {% else %}
+          <div class="avatar-large avatar-placeholder fs-2">
+            {{ user.first_name|default:user.username|slice:":1"|upper }}
+          </div>
+        {% endif %}
+        <div>
+          <span class="badge bg-primary bg-opacity-20 text-primary fw-semibold mb-1 border border-primary border-opacity-25">Student Dashboard</span>
+          <h2 class="fw-bold text-white mb-1">Welcome back, {{ user.first_name|default:user.username }}!</h2>
+          <p class="text-muted small mb-0">
+            <i class="bi bi-building me-1"></i> {{ profile.college_or_organization|default:"Organization not specified" }} &bull;
+            <i class="bi bi-geo-alt me-1"></i> {{ profile.city|default:"Location not set" }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="d-flex flex-wrap gap-2">
+        <a href="{% url 'profile_edit' %}" class="btn btn-outline-custom">
+          <i class="bi bi-pencil me-1"></i> Edit Profile
+        </a>
+        <a href="{% url 'manage_skills' %}" class="btn btn-outline-custom">
+          <i class="bi bi-plus-circle me-1"></i> Add Skill
+        </a>
+        <a href="{% url 'explore' %}" class="btn btn-primary-custom shadow-sm">
+          <i class="bi bi-compass me-1"></i> Explore Learners
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Overview Counters (6 metrics) -->
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stat-card shadow-sm text-center p-3 h-100">
+        <span class="small text-muted fw-semibold d-block">Skills to Teach</span>
+        <h3 class="fw-bold text-primary mb-0 mt-1">{{ teach_skills_count|default:"0" }}</h3>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stat-card shadow-sm text-center p-3 h-100">
+        <span class="small text-muted fw-semibold d-block">Skills to Learn</span>
+        <h3 class="fw-bold text-success mb-0 mt-1">{{ learn_skills_count|default:"0" }}</h3>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stat-card shadow-sm text-center p-3 h-100">
+        <span class="small text-muted fw-semibold d-block">Pending Requests</span>
+        <h3 class="fw-bold text-warning mb-0 mt-1">{{ pending_requests_count|default:"0" }}</h3>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stat-card shadow-sm text-center p-3 h-100">
+        <span class="small text-muted fw-semibold d-block">Active Exchanges</span>
+        <h3 class="fw-bold text-info mb-0 mt-1">{{ active_exchanges_count|default:"0" }}</h3>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stat-card shadow-sm text-center p-3 h-100">
+        <span class="small text-muted fw-semibold d-block">Completed</span>
+        <h3 class="fw-bold text-secondary mb-0 mt-1">{{ completed_exchanges_count|default:"0" }}</h3>
+      </div>
+    </div>
+
+    <div class="col-6 col-md-4 col-lg-2">
+      <div class="stat-card shadow-sm text-center p-3 h-100">
+        <span class="small text-muted fw-semibold d-block">Avg Rating</span>
+        <h3 class="fw-bold text-white mb-0 mt-1">
+          {% if profile.average_rating %}
+            {{ profile.average_rating }} <i class="bi bi-star-fill text-warning fs-6"></i>
+          {% else %}
+            N/A
+          {% endif %}
+        </h3>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- Active Exchanges Section -->
+    <div class="col-lg-7">
+      <div class="custom-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-dark pb-2">
+          <h5 class="fw-bold text-white mb-0"><i class="bi bi-arrow-left-right me-2 text-primary"></i> Active Exchanges</h5>
+          <a href="{% url 'requests_list' %}?tab=active" class="btn btn-sm btn-outline-custom">View All</a>
+        </div>
+
+        {% if active_exchanges %}
+          <div class="d-flex flex-column gap-3">
+            {% for req in active_exchanges %}
+              {% if req.sender == user %}
+                {% with partner=req.receiver %}
+                  <div class="p-3 border border-dark rounded-3 bg-light d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                    <div>
+                      <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="fw-bold text-white">{{ partner.first_name|default:partner.username }}</span>
+                        <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 small">Active</span>
+                      </div>
+                      <p class="small text-muted mb-0">
+                        Offered: <span class="badge-teach small me-2">{{ req.skill_offered.name }}</span>
+                        Requested: <span class="badge-learn small">{{ req.skill_requested.name }}</span>
+                      </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <a href="{% url 'profile_detail' partner.username %}" class="btn btn-sm btn-outline-custom">
+                        <i class="bi bi-person me-1"></i> Profile
+                      </a>
+                      <a href="{% url 'respond_request' req.id 'complete' %}" class="btn btn-sm btn-success fw-semibold">
+                        <i class="bi bi-check-circle me-1"></i> Complete
+                      </a>
+                    </div>
+                  </div>
+                {% endwith %}
+              {% else %}
+                {% with partner=req.sender %}
+                  <div class="p-3 border border-dark rounded-3 bg-light d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3">
+                    <div>
+                      <div class="d-flex align-items-center gap-2 mb-1">
+                        <span class="fw-bold text-white">{{ partner.first_name|default:partner.username }}</span>
+                        <span class="badge bg-success bg-opacity-20 text-success border border-success border-opacity-25 small">Active</span>
+                      </div>
+                      <p class="small text-muted mb-0">
+                        Offered: <span class="badge-teach small me-2">{{ req.skill_offered.name }}</span>
+                        Requested: <span class="badge-learn small">{{ req.skill_requested.name }}</span>
+                      </p>
+                    </div>
+                    <div class="d-flex gap-2">
+                      <a href="{% url 'profile_detail' partner.username %}" class="btn btn-sm btn-outline-custom">
+                        <i class="bi bi-person me-1"></i> Profile
+                      </a>
+                      <a href="{% url 'respond_request' req.id 'complete' %}" class="btn btn-sm btn-success fw-semibold">
+                        <i class="bi bi-check-circle me-1"></i> Complete
+                      </a>
+                    </div>
+                  </div>
+                {% endwith %}
+              {% endif %}
+            {% endfor %}
+          </div>
+        {% else %}
+          <!-- Modern Empty State Card -->
+          <div class="text-center py-5">
+            <div class="brand-icon bg-primary bg-opacity-20 text-primary mx-auto mb-3" style="width: 56px; height: 56px; font-size: 1.75rem;">
+              <i class="bi bi-arrow-left-right"></i>
+            </div>
+            <h6 class="fw-bold text-white mb-1">No Active Exchanges</h6>
+            <p class="text-muted small mb-3">You don't have any ongoing peer skill exchanges right now.</p>
+            <a href="{% url 'explore' %}" class="btn btn-sm btn-primary-custom">
+              <i class="bi bi-search me-1"></i> Find Learning Partners
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Recent Activity Timeline Section -->
+    <div class="col-lg-5">
+      <div class="custom-card p-4 h-100">
+        <div class="d-flex justify-content-between align-items-center mb-3 border-bottom border-dark pb-2">
+          <h5 class="fw-bold text-white mb-0"><i class="bi bi-activity me-2 text-danger"></i> Recent Activity</h5>
+          <a href="{% url 'notifications_list' %}" class="small fw-semibold text-primary text-decoration-none">View All</a>
+        </div>
+
+        {% if recent_activities %}
+          <div class="list-group list-group-flush">
+            {% for act in recent_activities %}
+              <div class="list-group-item px-0 py-3 border-bottom border-dark bg-transparent">
+                <div class="d-flex align-items-start gap-3">
+                  <div class="avatar-circle avatar-placeholder bg-primary bg-opacity-20 text-primary small" style="width: 36px; height: 36px;">
+                    {% if act.actor %}
+                      {{ act.actor.first_name|default:act.actor.username|slice:":1"|upper }}
+                    {% else %}
+                      <i class="bi bi-bell-fill"></i>
+                    {% endif %}
+                  </div>
+                  <div>
+                    <p class="small text-white mb-1">
+                      {% if act.actor %}
+                        <strong class="fw-bold">@{{ act.actor.username }}</strong>
+                      {% endif %}
+                      {{ act.verb }}
+                    </p>
+                    <span class="text-muted" style="font-size: 0.75rem;"><i class="bi bi-clock me-1"></i> {{ act.created_at|timesince }} ago</span>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <!-- Empty State Card -->
+          <div class="text-center py-4">
+            <div class="brand-icon bg-opacity-20 text-muted mx-auto mb-2" style="width: 48px; height: 48px; font-size: 1.25rem;">
+              <i class="bi bi-clock-history"></i>
+            </div>
+            <p class="text-muted small mb-0">No recent activity logged yet.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - SkillBridge{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="custom-card p-4 p-md-5">
+        <div class="d-flex align-items-center justify-content-between mb-4 border-bottom border-dark pb-3">
+          <div>
+            <h2 class="fw-bold text-white mb-0">Edit Profile</h2>
+            <p class="text-muted small mb-0">Update your personal information and peer preferences</p>
+          </div>
+          <a href="{% url 'profile' %}" class="btn btn-sm btn-outline-custom">
+            <i class="bi bi-arrow-left me-1"></i> Cancel
+          </a>
+        </div>
+
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <h5 class="fw-bold text-primary mb-3">Basic Information</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-white">First Name</label>
+              {{ u_form.first_name }}
+              {% if u_form.first_name.errors %}
+                <div class="text-danger small mt-1">{{ u_form.first_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-white">Last Name</label>
+              {{ u_form.last_name }}
+              {% if u_form.last_name.errors %}
+                <div class="text-danger small mt-1">{{ u_form.last_name.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-12">
+              <label class="form-label fw-semibold small text-white">Email Address</label>
+              {{ u_form.email }}
+              {% if u_form.email.errors %}
+                <div class="text-danger small mt-1">{{ u_form.email.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <h5 class="fw-bold text-primary mb-3">Academic & Peer Details</h5>
+          <div class="row g-3 mb-4">
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-white">College or Organization</label>
+              {{ p_form.college_or_organization }}
+              {% if p_form.college_or_organization.errors %}
+                <div class="text-danger small mt-1">{{ p_form.college_or_organization.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-white">City / Location</label>
+              {{ p_form.city }}
+              {% if p_form.city.errors %}
+                <div class="text-danger small mt-1">{{ p_form.city.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-white">Preferred Learning Mode</label>
+              {{ p_form.preferred_learning_mode }}
+              {% if p_form.preferred_learning_mode.errors %}
+                <div class="text-danger small mt-1">{{ p_form.preferred_learning_mode.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label fw-semibold small text-white">Profile Picture</label>
+              {{ p_form.profile_image }}
+              {% if p_form.profile_image.errors %}
+                <div class="text-danger small mt-1">{{ p_form.profile_image.errors.0 }}</div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-12">
+              <label class="form-label fw-semibold small text-white">Bio</label>
+              {{ p_form.bio }}
+              {% if p_form.bio.errors %}
+                <div class="text-danger small mt-1">{{ p_form.bio.errors.0 }}</div>
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 border-top border-dark pt-3">
+            <a href="{% url 'profile' %}" class="btn btn-outline-custom">Cancel</a>
+            <button type="submit" class="btn btn-primary-custom px-4">
+              <i class="bi bi-check-lg me-1"></i> Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

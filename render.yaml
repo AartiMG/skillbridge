@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: skillbridge
+    env: python
+    buildCommand: "./build.sh"
+    startCommand: "gunicorn skillbridge.wsgi:application"
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: DEBUG
+        value: "False"
+      - key: ALLOWED_HOSTS
+        value: ".onrender.com"

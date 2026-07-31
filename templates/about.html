@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}About SkillBridge - Student Skill Exchange Platform{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center text-center mb-5">
+    <div class="col-lg-8">
+      <span class="text-primary fw-bold text-uppercase small">About Our Mission</span>
+      <h1 class="fw-bold text-white display-5 mt-1 mb-3">Empowering Peer-to-Peer Learning</h1>
+      <p class="lead text-muted">
+        SkillBridge is a web platform built to connect ambitious students worldwide for knowledge exchange, collaborative learning, and practical skill mastery.
+      </p>
+    </div>
+  </div>
+
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="custom-card p-4 h-100">
+        <div class="brand-icon bg-primary bg-opacity-20 text-primary mb-3">
+          <i class="bi bi-lightbulb"></i>
+        </div>
+        <h4 class="fw-bold text-white mb-2">The Vision</h4>
+        <p class="text-muted small mb-0">
+          Remove monetary barriers to education by enabling students to trade their existing strengths for the skills they want to acquire.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="custom-card p-4 h-100">
+        <div class="brand-icon bg-success bg-opacity-20 text-success mb-3">
+          <i class="bi bi-hand-thumbs-up"></i>
+        </div>
+        <h4 class="fw-bold text-white mb-2">Mutual Benefit</h4>
+        <p class="text-muted small mb-0">
+          Teaching a concept solidifies your own understanding, while learning from a peer provides an informal, low-pressure environment to grow.
+        </p>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="custom-card p-4 h-100">
+        <div class="brand-icon bg-opacity-20 text-indigo mb-3" style="background-color: rgba(99, 102, 241, 0.2); color: #818cf8;">
+          <i class="bi bi-shield-check"></i>
+        </div>
+        <h4 class="fw-bold text-white mb-2">Trust & Accountability</h4>
+        <p class="text-muted small mb-0">
+          Verified peer rating systems ensure students engage with reliable, respectful learning partners across all academic domains.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="custom-card p-5 mb-5">
+    <h3 class="fw-bold text-white mb-4">Technology Stack & Architecture</h3>
+    <div class="row g-4">
+      <div class="col-md-6">
+        <h6 class="fw-bold text-primary mb-3"><i class="bi bi-code-slash me-2"></i> Backend Technology</h6>
+        <ul class="list-group list-group-flush small">
+          <li class="list-group-item px-0 border-dark bg-transparent text-white"><strong>Python 3.13:</strong> Modern robust backend logic</li>
+          <li class="list-group-item px-0 border-dark bg-transparent text-white"><strong>Django 5 / 6:</strong> Enterprise web framework with ORM and built-in security</li>
+          <li class="list-group-item px-0 border-dark bg-transparent text-white"><strong>SQLite DB:</strong> Fast local transactional database</li>
+          <li class="list-group-item px-0 border-dark bg-transparent text-white"><strong>WhiteNoise:</strong> Static asset compression and production deployment</li>
+        </ul>
+      </div>
+
+      <div class="col-md-6">
+        <h6 class="fw-bold text-primary mb-3"><i class="bi bi-palette me-2"></i> Frontend & UI Design</h6>
+        <ul class="list-group list-group-flush small">
+          <li class="list-group-item px-0 border-dark bg-transparent text-white"><strong>HTML5 & CSS3:</strong> Semantic structure & responsive CSS design tokens</li>
+          <li class="list-group-item px-0 border-dark bg-transparent text-white"><strong>Bootstrap 5:</strong> Responsive grid layout & accessible UI controls</li>
+          <li class="list-group-item px-0 border-dark bg-transparent text-white"><strong>Bootstrap Icons:</strong> Clean visual icon system</li>
+          <li class="list-group-item px-0 border-dark bg-transparent text-white"><strong>Vanilla JS:</strong> Dynamic form switching & alert management</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

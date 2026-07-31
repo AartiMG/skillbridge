@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - SkillBridge{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+    <div>
+      <h1 class="fw-bold text-white mb-1"><i class="bi bi-bell text-primary me-2"></i> Notifications</h1>
+      <p class="text-muted small mb-0">Stay updated on your skill exchange requests, acceptances, and reviews.</p>
+    </div>
+    {% if notifications %}
+      <a href="{% url 'notifications_list' %}?mark_all_read=true" class="btn btn-outline-custom btn-sm rounded-pill">
+        <i class="bi bi-check-all me-1"></i> Mark All as Read
+      </a>
+    {% endif %}
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      {% if notifications %}
+        <div class="custom-card p-0 overflow-hidden">
+          <div class="list-group list-group-flush">
+            {% for n in notifications %}
+              <a href="{% url 'mark_notification_read' n.id %}" class="list-group-item list-group-item-action p-4 border-bottom border-dark {% if not n.is_read %}bg-light border-start border-4 border-primary{% endif %} transition-all">
+                <div class="d-flex justify-content-between align-items-start gap-3">
+                  <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-circle avatar-placeholder bg-primary bg-opacity-20 text-primary fs-5" style="width: 44px; height: 44px;">
+                      {% if n.actor %}
+                        {{ n.actor.first_name|default:n.actor.username|slice:":1"|upper }}
+                      {% else %}
+                        <i class="bi bi-bell-fill"></i>
+                      {% endif %}
+                    </div>
+                    <div>
+                      <p class="mb-1 text-white">
+                        {% if n.actor %}
+                          <strong class="fw-bold">@{{ n.actor.username }}</strong>
+                        {% endif %}
+                        {{ n.verb }}
+                      </p>
+                      <span class="text-muted small"><i class="bi bi-clock me-1"></i> {{ n.created_at|timesince }} ago</span>
+                    </div>
+                  </div>
+
+                  {% if not n.is_read %}
+                    <span class="badge bg-primary rounded-pill small">New</span>
+                  {% endif %}
+                </div>
+              </a>
+            {% endfor %}
+          </div>
+        </div>
+      {% else %}
+        <!-- Empty State Card -->
+        <div class="custom-card p-5 text-center my-4">
+          <div class="brand-icon bg-primary bg-opacity-20 text-primary mx-auto mb-3" style="width: 64px; height: 64px; font-size: 2rem;">
+            <i class="bi bi-bell-slash"></i>
+          </div>
+          <h4 class="fw-bold text-white mb-2">No Notifications Yet</h4>
+          <p class="text-muted small mb-4">When peers send requests or leave reviews, your notifications will appear here.</p>
+          <a href="{% url 'explore' %}" class="btn btn-primary-custom shadow-sm">
+            <i class="bi bi-compass me-1"></i> Explore Learners
+          </a>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

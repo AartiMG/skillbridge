@@ -1,0 +1,236 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore Learners & Skills - SkillBridge{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <div>
+      <h1 class="fw-bold text-white mb-1">Explore Student Learners</h1>
+      <p class="text-muted small mb-0">Discover fellow students by skills offered, learning goals, category, or location.</p>
+    </div>
+    {% if user.is_authenticated %}
+      <a href="{% url 'manage_skills' %}" class="btn btn-outline-custom rounded-pill">
+        <i class="bi bi-plus-circle me-1"></i> Add Your Skills
+      </a>
+    {% endif %}
+  </div>
+
+  <!-- Search & Filter Controls Card -->
+  <div class="custom-card p-4 mb-4">
+    <form method="get" action="{% url 'explore' %}" id="search-filter-form">
+      <div class="row g-3">
+        <!-- Search Name / Org -->
+        <div class="col-md-4">
+          <label class="form-label small fw-semibold text-white">Search Student Name or Org</label>
+          <div class="input-group">
+            <span class="input-group-text bg-dark border-end-0"><i class="bi bi-search text-muted"></i></span>
+            <input type="text" name="q" value="{{ query }}" class="form-control border-start-0" placeholder="e.g. Alex, Stanford...">
+          </div>
+        </div>
+
+        <!-- Search Skill -->
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold text-white">Search Skill Name</label>
+          <input type="text" name="skill" value="{{ skill_filter }}" class="form-control" placeholder="e.g. Python, React...">
+        </div>
+
+        <!-- Category -->
+        <div class="col-md-3">
+          <label class="form-label small fw-semibold text-white">Skill Category</label>
+          <select name="category" class="form-select">
+            <option value="">All Categories</option>
+            {% for cat_val, cat_name in categories %}
+              <option value="{{ cat_val }}" {% if category_filter == cat_val %}selected{% endif %}>{{ cat_name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+
+        <!-- Sort By -->
+        <div class="col-md-2">
+          <label class="form-label small fw-semibold text-white">Sort By</label>
+          <select name="sort" class="form-select">
+            <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest</option>
+            <option value="highest_rated" {% if sort_by == 'highest_rated' %}selected{% endif %}>Highest Rated</option>
+            <option value="most_skills" {% if sort_by == 'most_skills' %}selected{% endif %}>Most Skills</option>
+            <option value="alphabetical" {% if sort_by == 'alphabetical' %}selected{% endif %}>Alphabetical</option>
+          </select>
+        </div>
+
+        <div class="col-12 d-flex justify-content-between align-items-center pt-2 border-top border-dark mt-3">
+          <span class="text-muted small">Showing {{ profiles|length }} of {{ page_obj.paginator.count }} learners</span>
+          <div class="d-flex gap-2">
+            <a href="{% url 'explore' %}" class="btn btn-outline-custom">Reset Filters</a>
+            <button type="submit" class="btn btn-primary-custom px-4" id="search-btn">
+              <span class="spinner-border spinner-border-sm me-1 d-none" id="search-spinner" role="status" aria-hidden="true"></span>
+              <i class="bi bi-funnel me-1" id="search-icon"></i> Apply Filters
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Learner Cards Grid -->
+  {% if profiles %}
+    <div class="row g-4 mb-4">
+      {% for profile_item in profiles %}
+        <div class="col-md-6 col-lg-4">
+          <div class="custom-card p-4 h-100 d-flex flex-column justify-content-between">
+            <div>
+              <div class="d-flex align-items-center gap-3 mb-3">
+                {% if profile_item.profile_image %}
+                  <img src="{{ profile_item.profile_image.url }}" alt="{{ profile_item.user.username }}" class="avatar-circle" style="width: 54px; height: 54px;">
+                {% else %}
+                  <div class="avatar-circle avatar-placeholder fs-4" style="width: 54px; height: 54px;">
+                    {{ profile_item.user.first_name|default:profile_item.user.username|slice:":1"|upper }}
+                  </div>
+                {% endif %}
+
+                <div class="text-truncate">
+                  <h5 class="fw-bold text-white mb-0 text-truncate">{{ profile_item.get_full_name_or_username }}</h5>
+                  <span class="text-muted small">@{{ profile_item.user.username }}</span>
+                  <div class="d-flex align-items-center gap-1 mt-1">
+                    {% if profile_item.average_rating %}
+                      <span class="badge bg-warning bg-opacity-20 text-warning border border-warning border-opacity-25 small fw-bold">
+                        <i class="bi bi-star-fill me-1"></i> {{ profile_item.average_rating }}
+                      </span>
+                    {% else %}
+                      <span class="badge bg-dark text-muted border border-dark small">New</span>
+                    {% endif %}
+                    <span class="badge bg-primary bg-opacity-20 text-primary border border-primary border-opacity-25 small">{{ profile_item.preferred_learning_mode }}</span>
+                  </div>
+                </div>
+              </div>
+
+              {% if profile_item.college_or_organization or profile_item.city %}
+                <p class="small text-muted mb-3">
+                  {% if profile_item.college_or_organization %}
+                    <i class="bi bi-building me-1 text-primary"></i> {{ profile_item.college_or_organization }}<br>
+                  {% endif %}
+                  {% if profile_item.city %}
+                    <i class="bi bi-geo-alt me-1 text-primary"></i> {{ profile_item.city }}
+                  {% endif %}
+                </p>
+              {% endif %}
+
+              <!-- Can Teach Skills preview -->
+              <div class="mb-3">
+                <span class="small text-white fw-bold d-block mb-1"><i class="bi bi-mortarboard text-primary me-1"></i> Can Teach:</span>
+                {% with teach_list=profile_item.get_skills_teach %}
+                  {% if teach_list %}
+                    <div class="d-flex flex-wrap gap-1">
+                      {% for us in teach_list|slice:":3" %}
+                        <span class="badge-teach" style="font-size: 0.75rem;">{{ us.skill.name }}</span>
+                      {% endfor %}
+                      {% if teach_list|length > 3 %}
+                        <span class="badge bg-dark text-muted border border-dark" style="font-size: 0.75rem;">+{{ teach_list|length|add:"-3" }} more</span>
+                      {% endif %}
+                    </div>
+                  {% else %}
+                    <span class="text-muted small italic">None added</span>
+                  {% endif %}
+                {% endwith %}
+              </div>
+
+              <!-- Wants to Learn Skills preview -->
+              <div class="mb-3">
+                <span class="small text-white fw-bold d-block mb-1"><i class="bi bi-book me-1" style="color: #2dd4bf;"></i> Wants to Learn:</span>
+                {% with learn_list=profile_item.get_skills_learn %}
+                  {% if learn_list %}
+                    <div class="d-flex flex-wrap gap-1">
+                      {% for us in learn_list|slice:":3" %}
+                        <span class="badge-learn" style="font-size: 0.75rem;">{{ us.skill.name }}</span>
+                      {% endfor %}
+                      {% if learn_list|length > 3 %}
+                        <span class="badge bg-dark text-muted border border-dark" style="font-size: 0.75rem;">+{{ learn_list|length|add:"-3" }} more</span>
+                      {% endif %}
+                    </div>
+                  {% else %}
+                    <span class="text-muted small italic">None added</span>
+                  {% endif %}
+                {% endwith %}
+              </div>
+            </div>
+
+            <div class="pt-3 border-top border-dark mt-3">
+              <a href="{% url 'profile_detail' profile_item.user.username %}" class="btn btn-outline-custom w-100 btn-sm">
+                <i class="bi bi-person me-1"></i> View Profile & Exchange
+              </a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Bootstrap 5 Pagination Controls -->
+    {% if page_obj.has_other_pages %}
+      <nav aria-label="Learner Pagination" class="d-flex justify-content-center">
+        <ul class="pagination pagination-rounded gap-1">
+          {% if page_obj.has_previous %}
+            <li class="page-item">
+              <a class="page-link bg-dark text-white border-dark" href="?page=1{% if query %}&q={{ query }}{% endif %}{% if skill_filter %}&skill={{ skill_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">&laquo; First</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link bg-dark text-white border-dark" href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if skill_filter %}&skill={{ skill_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Previous</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link bg-dark text-muted border-dark">&laquo; First</span></li>
+          {% endif %}
+
+          {% for num in page_obj.paginator.page_range %}
+            {% if page_obj.number == num %}
+              <li class="page-item active"><span class="page-link bg-primary border-primary text-white">{{ num }}</span></li>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+              <li class="page-item">
+                <a class="page-link bg-dark text-white border-dark" href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if skill_filter %}&skill={{ skill_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">{{ num }}</a>
+              </li>
+            {% endif %}
+          {% endfor %}
+
+          {% if page_obj.has_next %}
+            <li class="page-item">
+              <a class="page-link bg-dark text-white border-dark" href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if skill_filter %}&skill={{ skill_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Next</a>
+            </li>
+            <li class="page-item">
+              <a class="page-link bg-dark text-white border-dark" href="?page={{ page_obj.paginator.num_pages }}{% if query %}&q={{ query }}{% endif %}{% if skill_filter %}&skill={{ skill_filter }}{% endif %}{% if category_filter %}&category={{ category_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Last &raquo;</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link bg-dark text-muted border-dark">Last &raquo;</span></li>
+          {% endif %}
+        </ul>
+      </nav>
+    {% endif %}
+
+  {% else %}
+    <!-- Modern Empty State Illustration Card -->
+    <div class="custom-card p-5 text-center my-4">
+      <div class="brand-icon bg-primary bg-opacity-20 text-primary mx-auto mb-3" style="width: 64px; height: 64px; font-size: 2rem;">
+        <i class="bi bi-search"></i>
+      </div>
+      <h4 class="fw-bold text-white mb-2">No Students Found</h4>
+      <p class="text-muted small mb-4">We couldn't find any learners matching your filter criteria. Try adjusting your search query or removing filters.</p>
+      <a href="{% url 'explore' %}" class="btn btn-primary-custom px-4 shadow-sm">
+        <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filters
+      </a>
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('search-filter-form');
+    const searchBtn = document.getElementById('search-btn');
+    const searchSpinner = document.getElementById('search-spinner');
+    const searchIcon = document.getElementById('search-icon');
+
+    if (form && searchBtn) {
+      form.addEventListener('submit', function() {
+        searchSpinner.classList.remove('d-none');
+        searchIcon.classList.add('d-none');
+        searchBtn.disabled = true;
+      });
+    }
+  });
+</script>
+{% endblock %}

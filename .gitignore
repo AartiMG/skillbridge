@@ -1,0 +1,24 @@
+# Python bytecode / cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+ENV/
+env/
+.env
+
+# Database
+db.sqlite3
+
+# Static / Media runtime output
+staticfiles/
+media/profile_pics/*
+!media/profile_pics/.gitkeep
+
+# IDEs & System
+.vscode/
+.idea/
+.DS_Store
+*.log

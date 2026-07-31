@@ -1,0 +1,65 @@
+<footer class="footer-custom">
+  <div class="container">
+    <div class="row g-4 mb-4">
+      <div class="col-lg-4 col-md-6">
+        <div class="d-flex align-items-center gap-2 mb-3">
+          <div class="brand-icon">
+            <i class="bi bi-mortarboard-fill"></i>
+          </div>
+          <span class="fs-4 fw-bold text-white">SkillBridge</span>
+        </div>
+        <p class="small text-secondary mb-3">
+          The ultimate peer-to-peer student skill exchange platform. Connect with fellow students to teach what you know and learn what you need to grow together.
+        </p>
+        <div class="d-flex flex-wrap gap-2">
+          <span class="badge bg-secondary bg-opacity-25 text-light fw-normal"><i class="bi bi-code-slash me-1"></i> Python 3</span>
+          <span class="badge bg-secondary bg-opacity-25 text-light fw-normal"><i class="bi bi-layers me-1"></i> Django 5</span>
+          <span class="badge bg-secondary bg-opacity-25 text-light fw-normal"><i class="bi bi-bootstrap me-1"></i> Bootstrap 5</span>
+          <span class="badge bg-primary bg-opacity-25 text-primary fw-normal">v1.2.0</span>
+        </div>
+      </div>
+
+      <div class="col-lg-2 col-md-6">
+        <h6 class="text-white fw-bold mb-3">Quick Links</h6>
+        <ul class="list-unstyled small d-flex flex-column gap-2">
+          <li><a href="{% url 'home' %}"><i class="bi bi-chevron-right me-1 text-primary"></i> Home</a></li>
+          <li><a href="{% url 'explore' %}"><i class="bi bi-chevron-right me-1 text-primary"></i> Explore Learners</a></li>
+          <li><a href="{% url 'about' %}"><i class="bi bi-chevron-right me-1 text-primary"></i> About Platform</a></li>
+          <li><a href="{% url 'register' %}"><i class="bi bi-chevron-right me-1 text-primary"></i> Join SkillBridge</a></li>
+        </ul>
+      </div>
+
+      <div class="col-lg-3 col-md-6">
+        <h6 class="text-white fw-bold mb-3">Popular Categories</h6>
+        <ul class="list-unstyled small d-flex flex-column gap-2">
+          <li><a href="{% url 'explore' %}?category=Web+Development"><i class="bi bi-tag me-1 text-info"></i> Web Development</a></li>
+          <li><a href="{% url 'explore' %}?category=Artificial+Intelligence"><i class="bi bi-tag me-1 text-info"></i> AI & Machine Learning</a></li>
+          <li><a href="{% url 'explore' %}?category=Programming"><i class="bi bi-tag me-1 text-info"></i> Programming Languages</a></li>
+          <li><a href="{% url 'explore' %}?category=Design"><i class="bi bi-tag me-1 text-info"></i> UI/UX Design</a></li>
+        </ul>
+      </div>
+
+      <!-- <div class="col-lg-3 col-md-6">
+        <h6 class="text-white fw-bold mb-3">Contact & Open Source</h6>
+        <p class="small text-secondary mb-2">
+          <i class="bi bi-envelope-fill text-primary me-2"></i>
+          <a href="mailto:support@skillbridge.edu" class="text-white text-decoration-none">support@skillbridge.edu</a>
+        </p>
+        <p class="small text-secondary mb-3">
+          <i class="bi bi-github text-white me-2"></i>
+          <a href="https://github.com/skillbridge/skillbridge" target="_blank" rel="noopener" class="text-white text-decoration-none">GitHub Repository</a>
+        </p>
+        <div class="text-secondary small">
+          <i class="bi bi-shield-check text-success me-1"></i> Verified Student Community
+        </div>
+      </div>
+    </div> -->
+
+    <hr class="border-secondary border-opacity-25 my-4">
+
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center small text-secondary">
+      <p class="mb-2 mb-md-0">&copy; 2026 SkillBridge Student Skill Exchange. All rights reserved.</p>
+      <p class="mb-0">Platform Version: <strong class="text-white">v1.2.0</strong></p>
+    </div>
+  </div>
+</footer>
